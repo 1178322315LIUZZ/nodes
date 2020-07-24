@@ -1,0 +1,316 @@
+一、集合与数组的区别
+
+相同点：
+都是用来存储数据的。
+不同点：
+1.集合带array的，底层由数组实现，还有一部分由其他方式(树、链表等)实现。
+2.数组大小固定，而集合没有固定的大小，更方便存储。
+3.数组只能放一种类型，集合不考虑泛型可以存多种类型。
+4.集合放基本类型是通过装箱拆箱(包装类与基本数据类型的转换)来实现的。（写泛形的时候不能用int，而要用Integer）
+二、几种常用集合之间的关系
+
+Map接口自成一系，是以键值对(Key,Value)方式存储数据的，属于双列集合。
+Set接口的实现类： HashSet、LinkedHashSet、TreeSet。
+List接口的实现类：ArrayList、LinkedList、Vector(线程安全)。
+Queue接口的实现类 ： LinkedList、PriorityQueue。(没怎么用过，混个脸熟)
+Map接口的实现类：HashMap、TreeMap、Hashtable(线程安全)。
+三、每种集合的性质
+
+3.1Collection接口(单列)
+
+Collection接口的常用方法：
+
+add(T t) //添加指定元素 
+remove(T t) //删除指定元素 
+isEmpty() //集合是否为空 
+iterator() //获得迭代器(Iterator类型)，一般用于遍历 
+size() //获得元素的个数 
+contains(T t) //是否包含某元素
+
+3.1.1.List 有序,可重复
+
+List接口的常用方法
+
+add(int index, T t) //向指定位置添加元素 
+remove(int index) //删除指定元素 
+get(int index) //获取指定位置的元素 
+set(int index, T t) //修改指定位置的元素 
+indexOf(T t) //获取指定元素的位置
+
+ArrayList 底层数据结构是数组，查询快，增删慢。
+ArrayList的常用方法都是从List继承来的，就不多说了。
+
+LinkedList 底层数据结构是链表，查询慢，增删快。
+LinkedList 的常用方法：
+
+getFirst() //获取第一个元素 
+getLast() //获取最后一个元素 
+offer(T t) //在最后位置追加元素 
+offerFirst(T t) //在开头位置追加元素 
+offerLast(T t) //在最后位置追加元素 
+removeFirst() //删除第一个元素 
+removeLast() //删除最后一个元素
+
+Vector 底层数据结构是数组，线程安全，效率低。
+使用方法和ArrayList基本一样。
+
+3.1.2.Set 不可重复
+
+方法：常用的都是从Collection继承到的，就轻松了许多。
+HashSet (无序,唯一)
+底层数据结构是哈希表。
+如何保证唯一：hashCode()和equals()
+
+LinkedHashSet(有序,唯一)
+底层数据结构是链表和哈希表。链表保证有序，哈希表保证唯一。
+
+TreeSet(有序，唯一)
+
+底层数据结构是红黑树。
+
+1.如何排序(add()方法的重载)：
+自然排序（无参add()调用Comparable的compareTo()方法）
+定制排序 （add(? extends Comparator)调用类实现的compare()方法）
+注：装载时若自然排序无法进行排序会报错，所以对装进集合的类实现Comparator接口进行自定义排序
+
+2.如何保证唯一：
+根据比较的返回值是否为0来决定。
+
+3.1.3.Queue 有序(FIFO先进先出)
+
+PriorityQueue 有序(定制排序、自然排序(也就是说不是所谓的FIFO)，我用的少，所以不是特别了解)
+
+3.2Map接口(双列)
+
+put (K key,V value):把键与值添加到Map集合中  
+remove (K key):删除key对应的值  
+get(K  key)：根据指定的键，获取对应的值  
+containKey(K key):判断是否包含指定的键  
+entrySet() :返回Map.Entry型对象，用于遍历。(entry.getKey()/entry.getValue()) 
+keySet(K key):获取Map集合中所有的Key，存储到set集合中(用于遍历)  
+values(V value) :获取Map集合中所有的Value，存储到Collection集合中(用于遍历)
+
+3.2.1HashMap
+
+HashMap的常用方法都继承自Map接口，就不细说了。HashMap是最常用的键值对存储容器。
+
+3.2.2.TreeMap
+
+构造器:
+TreeMap()//创建一个空TreeMap，keys按照自然排序
+TreeMap(Comparator comparator)//创建一个空TreeMap，按照自定义的comparator排序。
+
+3.2.3.Hashtable(线程安全)
+
+与HashMap的异同：
+同：Hashtable和HashMap使用方法基本一致。
+异：HashMap线程不安全，而Hashtable是线程安全的；HashMap的K和V都可以为null，而Hashtable的K,V都不能为null。
+
+
+
+
+
+集合框架有何好处#
+
+集合弥补了数组的缺陷，他比数组更灵活更实用，可大大提高软件的开发效率，而且不同的集合可使用与不同场合
+数组和集合的区别#
+
+    数组长度固定，集合长度可以动态改变
+    定义数组时必须指定元素类型，集合默认所有元素都是Object
+    无法直接获取数组中实际元素的个数，集合可以通过size()直接获取元素个数
+    集合有多种实现方式和不同的适合场合，而不像数组仅采用分配连续空间方式。
+    集合以接口，类的形式存在，具有面向对象的三大特征，提高了软件的开发效率
+
+Hashtable和HashMap的异同#
+
+实现原理、功能相同，可以互用
+主要区别
+
+    Hashtable继承Dictionary类，HashMap实现Map接口
+    Hashtable线程安全，HashMap线程非安全
+    Hashtable不允许null值，HashMap允许null值
+
+泛型集合的好处#
+
+    严格限制存入元素的数据类型，从集合中取出元素时无需进行强制类型转换，避免了ClassCastException异常。
+
+Collections算法类#
+
+    Collections和Collection不同，前者是集合的操作类，后者是集合接口
+    Collections提供的常用静态方法
+    sort():排序
+    binarySearch()：查找
+    max()\min():查找最大\最小值
+
+集合类有哪些#
+
+    Collection（接口）（由List和Set两部分组成）
+
+    List（接口）
+        LinkedList（类）
+        ArrayList（类）
+        Vector（类）
+        stack（类）
+
+    Set接口
+
+    Map接口
+        Hashtable（类）
+        HashMap（类）
+        WeakHashMap（类）
+
+如何使用集合类#
+
+    如果涉及到堆栈、队列等操作，应当考虑List，对于需要快速插入，删除元素，应该使用LinkedList，如果需要快速随机访问元素，应该使用ArrayList
+    哈希表的操作，作为Key的对象要正确复写equals和hashCode方法
+    尽量返回接口而非实际的类型，如返回List而非ArrayList，这样如果将来要将ArrayList换成LinkedList时，客户端代码不用改变
+    List可以有类似数组的下标操作，且允许有相同的元素存在；Map是以键值对（KeyValue）的形式存在，不能存在相同的键
+
+常用集合类#
+
+    ArrayList类：
+    ArrayList实现可变大小的数组，长度随着元素的增加而变化，而且可以存在重复的元素
+    HashMap类：
+    允许null，即null key，null value。且存在的形式是key-value形式，不允许有key重复
+
+Collection的使用#
+Collection接口是什么#
+
+    Collection接口是可以理解成动态的数组、集合，和数组类似，但不同的是集合可以任意扩充大小
+    Collection是最基本的接口，Java SDK提供的类都是继承自Collection的子接口，例如“List”、“Set”
+
+Collection接口特点#
+
+    性能高
+    易扩展
+    易修改
+
+List接口的使用#
+List接口的特点#
+
+    List接口可以存放任意的数据，且在接口中，内容可以重复
+    List中提供了高效的插入和移除多个元素的方法
+
+List常用（实现）子类#
+
+    ArrayList（实现类）
+    例：List list = new ArrayList<>();
+    Vector（实现类）
+    例：List list = new Vector<>();
+
+ArrayList和Vector区别#
+|ArrayList 	Vector
+推出时间 	JDK1.2后
+性能 	异步处理，性能高
+线程安全 	非线程安全
+Set的使用#
+Set接口的特点#
+
+Set接口可以存放任意的数据，且在接口中，数据不可以重复（注意和List进行区别）
+Set接口常用子类#
+
+    HashSet
+    Set sets = new HashSet<>();
+    TreeSet
+    Set sets = new TreeSet<>();
+
+HashSet和TreeSet的区别#
+
+    HashSet与TreeSet都是间接实现了Set接口，同样拥有add、remove等方法
+    HashSet是无序存放的、而TreeSet实现是有序存放（ASCII顺序存放）
+
+Map的使用#
+Map的特点#
+
+    Map接口存放数据是以键值对的形式存放，例如：
+
+    key -> value
+    "name" -> "尼古拉斯赵四"
+    "age" -> "33"
+
+    键（key）的类型要一致，值（value）的类型也要一致。
+
+Map常用实现类（实现类的方法和List、Set的方法不一样）#
+
+    HashMap
+
+    Map<String,String> maps = new HashMap<>();
+    maps.put("name","詹姆斯刘能");
+    maps.put("age","24");
+
+List接口常用方法#
+
+    boolean add(Object o) 在列表的末尾顺序添加元素，起始索引位置从0开始
+    void add(int index,Object o) 在指定的索引位置添加元素。索引位置必须介于0和列表中元素个数之间
+    int size()返回列表中的元素个数
+    Object get(int index)返回指定索引位置处的元素。取出的元素是Object类型，使用前需要进行强制类型转换
+    boolean contains(Object o) 判断列表中是否存在指定元素
+    boolean remove(Object o) 从列表中删除元素
+    Object remove(int index) 从列表中删除指定位置元素，起始索引位置从0开始
+
+LinkedList常用方法#
+
+    void addFirst(Object o) 在列表的首部添加元素
+    void addLast(Object o) 在列表的末尾添加元素
+    Object getFirst() 返回列表中的第一个元素
+    Object getLast() 返回列表中的最后一个元素
+    Object removeFirst() 删除并返回列表中的第一个元素
+    Object removeLast() 删除并返回列表中的最后一个元素
+
+Map接口常用方法#
+
+    Object put(Object key, Object val) 以“键-值”对的方式进行存储
+    Object get(Object key) 根据键返回相关联的值，如果不存在指定的键，返回null
+    Object remove(Object key) 删除由指定的键映射的“键-值对”
+    int size() 返回元素个数
+    Set keySet() 返回键的集合
+    Collection values() 返回值的集合
+    boolean containsKey(Object key) 如果存在由指定的键映射的“键-值对”，返回true
+
+迭代器iterator的使用（接口）#
+
+    iterator自带常用方法
+
+        hasNext：如果仍有元素可以迭代，则返回true
+
+        next：返回迭代下一个元素
+
+        remove：从迭代器指向的collection中移除迭代器返回的最后一个元素（可选操作）
+
+        Set sets = maps.keySet();
+        Iterator iterator = sets.iterator();
+        while(iterator.hasNext()){
+        System.out.println("key=" + iterator.next());
+        }
+
+    Collection collection = maps.values();
+    Iterator iterator = collection.iterator();
+    while(iterator.hasNext()){
+    System.out.println("value=" + iterator.next());
+    }
+
+
+
+Collection接口有List和Set两大类子接口，List有ArrayList、LinkedList、Vector子类，Set有TreeSet和HashSet两个子类。
+
+    ArrayList和LinkedList使用比较类似，存放在里面的元素都是顺序存放。ArrayList相当于普通链表，而LinkedList相当于队列。
+    Vector是一个比较旧的类，从1.0版本就开始出现。
+    Collection接口支持foreach和Iterator输出，而List接口支持ListIterator输出，Vector子类支持Enumeration输出。
+    Set接口的共同特点是不允许元素重复。
+    而TreeSet和HashSet的区别在于TreeSet有排序功能，而存放在HashSet的元素没有排序。
+    存放于TreeSet的元素必须实现Comparable接口，因为排序需要调用Comparable接口的方法，实现二叉树排序。
+    存放于HashSet的元素必须复写Object类中hashCode()和equals()方法。hashCode决定了元素存放的位置,而equals()方法决定了该元素是否存在。
+
+ 
+
+2）Map接口有HashMap和TreeMap以及Hashtable子类。
+
+　　同样的，TreeMap有排序功能，存放于里面的元素必须实现Comparable接口。HashMap没有排序功能，存放于里面的元素必须要复写Object的hashCode和equals方法
+
+3）所有的Collection子类都支持Iterator和foreach的遍历访问方式。同时注意，尽量不要在iterator遍历的时候修改或者删除元素。
+
+4）Map接口提供了keySet()和values()方法用于获取所有的key和value
+
+5）Map接口还提供了entrySet()方法，该方法返回Set<Map.Entry<K,V>>类型的Set，这样可以将Map转换为Set集合进行操作(一般用于输出).
+
+

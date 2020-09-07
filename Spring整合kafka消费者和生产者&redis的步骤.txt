@@ -1,0 +1,170 @@
+==================================================================================
+一.整合kafka(生产者)步骤
+1.导入依赖(pom.xml)
+2.编写配置文件,修改配置文件的ip和端口号,修改主题(producer.xml)
+3.如果再ssm项目中可以让spring.xml来加载这个配置文件
+	<import resource="classpath:XXX.xml" />
+	如果是再测试类中如何加载?
+	@RunWith(SpringJUnit4ClassRunner.class)
+	//加载生产者的配置
+	@ContextConfiguration("classpath:producer.xml")
+4.就可以在代码中所需的位置进行注入:
+	@Autowired
+	KafkaTemplate<String, String> kafkaTemplate;
+	然后就可以直接调用send方法来发送消息 了!!(如果我们发送的是对象,一般情况下,会把对象转成json再发送)
+	kafkaTemplate.send("cms_articles",jsonString);
+
+二.整合kafka消费者的步骤
+1.导入依赖(pom.xml)
+2.编写配置文件,修改ip和端口号,和监听的主题,指定监听器类的位置(consumer.xml)
+3.如果再ssm项目中可以让spring.xml来加载这个配置文件
+	<import resource="classpath:XXX.xml" />
+	如果在测试类中:
+	//先启动消费者,因为只有消费者先启动,kafka生产者发来的消息,才能时刻被接收到.
+	public static void main(String[] args) {
+		//加载消费者的配置文件!
+		new ClassPathXmlApplicationContext("classpath:consumer.xml");
+	}
+4.编写监听器的类
+	让这个类实现MessageListener<String,String> 接口,重写onMessage方法
+	这个方法就是监听消息的方法
+	//监听爬虫项目发来的文章的json串
+	public class ArticleListener implements MessageListener<String, String>{
+	//就是监听消息的方法
+		@Override
+		public void onMessage(ConsumerRecord<String, String> data){
+			//在这里就可以调用方法来接收消息
+			String msg = data.value();
+		} 
+	};
+==================================================================================	
+三.整合redis的步骤
+1.导入依赖(pom.xml)
+2.编写配置文件,修改ip和端口
+3.让spring.xml加载redis.xml
+4.可以在代码的位置注入RedisTemplate
+5.就可对redis进行crud了
+
+redis优化步骤(缓存)
+/////////////第一次访问
+1.用户第一次访问的时候,从redis中查询数据
+2.判断redis中查询的数据是否为空
+3.如果为空,就意味着是第一次访问,就从mysql中查询数据,并且往redis中保存一份,返回给前台
+//////////////////第2,3,4...次访问
+4.如果不为空,就意味着不是第一次访问,直接返回给前台redis的数据
+==================================================================================
+四.整合ElasticSearch的步骤
+1.导入依赖(pom.xml)
+2.编写配置文件(es.xml)
+3.修改ip地址和端口号&&修改仓库接口的包扫描位置
+4.让spring来加载es.xml
+	<import resource="classpath:es.xml" />
+5.在第3步仓库接口包的位置,创建一个仓库接口XXXRepository
+6.让仓库接口继承ElasticSearchRepository,之后就自动具备了简单的CRUD的方法
+	extends ElasticsearchRepository<User, Integer>
+7.声明实体类的各种注解(指定索引库名,表名,主键,实体类属性存储参数)
+	//指定了库名(库名必须用纯小写的名字,不允许有特殊字符,否则就报错),指定了表名
+	@Document(indexName="test_user",type="user")
+	@Id
+	//指定name的值是否索引,2.是否存储3.name的值的分词方式  4.搜索的关键字分词的方式  5指定该字段的值以什么样的数据类型来存储
+	@Field(index=true,store=true,analyzer="ik_smart",searchAnalyzer="ik_smart",type=FieldType.text)
+8可以在任意位置进行注入仓库接口,也可以注入ElasticSearchTemplate
+	@Autowired
+	UserRespository respository;
+	@Autowired
+	ElasticsearchTemplate elasticsearchTemplate;
+就可以调用crud方法了
+注意:如果要进行复杂点的查询,此时,需要我们自定义方法.自定义方法的规则必须按照命名规则来进行为方法命名
+具体示例:
+	List<User> findByName(String name);
+	
+	//根据地址查询
+	//	List<User> findByAddress(String address);
+	//	
+	//	//根据地址和姓名查询
+	//	List<User> findByAddressAndName(String address,String name);
+	
+	//	//根据地址或姓名查询
+	//	List<User> findByAddressOrName(String address,String name);
+	
+	//查询id小于5的数据
+	//	List<User> findByIdLessThan(int id);
+	
+	//查询价格在多少-多少之间的
+	List<User> findByPriceBetween(double money,double money)
+
+cms系统中,实现搜索(高亮显示)
+
+<!-- 搜索框 -->
+				<form action="/search" method="get">
+					<div class="input-group mb-3">
+						<input type="text" name="key" value="${key}" class="form-control"
+							placeholder="请输入要搜索的内容" aria-label="Recipient's username"
+							aria-describedby="button-addon2">
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" id="button-addon2">搜索</button>
+						</div>
+					</div>
+				</form>
+1.页面层面->必须有搜索框和搜索按钮
+2.修改搜索框的form表单的请求方式,和请求路径
+3.根据前台的form表达的请求方式,然后编写后台controller层.(让controller层的代码,接收咱们的搜索关键字)
+4.由于咱们的搜索数据是从es索引库来查找的,因此我们要做的事情:从mysql中查询出来数据,然后保存到es索引库
+	es索引库就有数据了
+5.由于cms系统还有集成es技术呢,因此,我还要做一件事情:在cms系统中,整合es---->参考四
+6.可以调用仓库接口(findByTitle())实现普通搜索(非高亮)
+7.如果要实现高亮的话:调用高亮显示的工具类
+	//1.搜索需要的模板类 2.指定要操作的实体类类型 3.当前页 4.每页页显示多少条 5.是一个string类型的数组数组里存放的是:来进行搜索的字段(必须和实体类中的字段保持一致) 6.指定要排序的字段 7.搜索的关键字
+	PageInfo<cms_article> info = (PageInfo<cms_article>) HLUtils.findByHighLight(elasticsearchTemplate, cms_article.class, pageNum, pageSize, new String[] {"title"}, "id", key);
+
+====================================================================================================
+把项目部署到linux系统
+1.修改数据库 的相关连接:db.properties里  
+	把mysql的ip地址写成windows的ip  (ipconfig,如果连的是无线网,找无线局域网适配器  Ipv4的地址
+										如果连的是网线,就找局域网,本地连接 ipv4)
+2.对着你的项目,右键 Run as   --> Maven build  -->package (跳过测试skip tests)--等他执行完毕
+3.执行完毕后,在日志里找到war包所在的位置,把他copy出来到桌面,重命名叫ROOT.war
+4.把ROOT.war 上传到linux里的tomcat目录下的webapps下,并且删除ROOT文件夹
+5.进到tomcat的bin目录上一级,执行-->  ./bin/shutdown.sh  先关闭tomcat  ---> 动态查看tomcat日志 tail -f logs/catalina.out -->  ./bin/startup.sh  开启tomcat
+6.浏览器直接输入:linux的ip:8080/访问路径
+7.为linux的ip虚拟一个域名-->到c盘下找到如下路径: C:\Windows\System32\drivers\etc  找到hosts文件,右键打开,添加一句: 192.168.21.128 www.gengjiaxin.com 保存
+9.直接在浏览器利用域名加端口号的形式来访问了
+====================注意:=====================
+在项目部署的时候:如果是你认为你的步骤都对,项目也对,但是,访问项目一直转圈,访问不了
+有可能是你的windows上的mysql安装的时候,不允许远程用户访问(只允许localhost或者127.0.0.1来访问)
+只需要打开小绿叶执行如下两个命令:
+	GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '这个是你的mysql的密码';
+	flush privileges;
+
+部署步骤
+0.首先测试项目可以跑起来吗
+1.改配置db.properties改密码
+2.跳过测试打成package(必须确保项目都能跑起来) Run As maven build.. package skip Tests  找到打包的那个jar复制到桌面上重命名ROOT必须大写
+3.转成sql文件并导入虚拟机数据库中 数据库名保持一致
+4.在虚拟机上启动tomcat日志 克隆会话启动   首先cd /opt/tomcat/apache-tomcat-8.0.21  然后 tail -f logs/catalina.out
+5.删除cd /opt/tomcat/apache-tomcat-8.0.21/webapps/ 下的所有ROOT文件并删除
+6.上传桌面文件到 cd /opt/tomcat/apache-tomcat-8.0.21/webapps/ 下 执行rz
+7.启动tomcat 首先cd /opt/tomcat/apache-tomcat-8.0.21/bin/ 然后./startup.sh
+8.启动浏览器访问项目地址是 虚拟机地址:8080
+9.访问之后关闭tomcat   ./shutdown.sh 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

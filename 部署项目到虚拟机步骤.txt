@@ -1,0 +1,11 @@
+部署步骤
+0.首先测试项目可以跑起来吗
+1.改配置db.properties改密码
+2.跳过测试打成package(必须确保项目都能跑起来) Run As maven build.. package skip Tests  找到打包的那个jar复制到桌面上重命名ROOT必须大写
+3.转成sql文件并导入虚拟机数据库中 数据库名保持一致
+4.在虚拟机上启动tomcat日志 克隆会话启动   首先cd /opt/tomcat/apache-tomcat-8.0.21  然后 tail -f logs/catalina.out
+5.删除cd /opt/tomcat/apache-tomcat-8.0.21/webapps/ 下的所有ROOT文件并删除
+6.上传桌面文件到 cd /opt/tomcat/apache-tomcat-8.0.21/webapps/ 下 执行rz
+7.启动tomcat 首先cd /opt/tomcat/apache-tomcat-8.0.21/bin/ 然后./startup.sh
+8.启动浏览器访问项目地址是 虚拟机地址:8080
+9.访问之后关闭tomcat   ./shutdown.sh 
